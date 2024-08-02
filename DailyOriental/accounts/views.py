@@ -1,7 +1,8 @@
 # accounts/views.py
-from rest_framework import generics, permissions
-from rest_framework.response import Response
+from rest_framework import generics, permissions,status
+from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
+from rest_framework.response import Response
 from .models import CustomUser
 from .serializers import CustomUserSerializer
 from rest_framework.authtoken.views import ObtainAuthToken
@@ -13,11 +14,18 @@ class RegisterView(generics.CreateAPIView):
     permission_classes = [permissions.AllowAny]
 
     def create(self, request, *args, **kwargs):
-        print("Request Data:", request.data)  # 요청 데이터를 출력하여 디버깅
-        response = super().create(request, *args, **kwargs)
-        user = CustomUser.objects.get(id=response.data['id'])
+        print("Request Data:", request.data)
+        serializer = self.get_serializer(data=request.data)
+        try:
+            serializer.is_valid(raise_exception=True)
+        except Exception as e:
+            print("Validation Error:", e.detail)
+            return Response({'error': e.detail}, status=status.HTTP_400_BAD_REQUEST)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        user = CustomUser.objects.get(id=serializer.data['id'])
         token, created = Token.objects.get_or_create(user=user)
-        return Response({'token': token.key, 'user': response.data})
+        return Response({'token': token.key, 'user': serializer.data}, status=status.HTTP_201_CREATED, headers=headers)
 
 class CustomAuthToken(ObtainAuthToken):
     def post(self, request, *args, **kwargs):
@@ -37,3 +45,22 @@ class CustomAuthToken(ObtainAuthToken):
         
         token, created = Token.objects.get_or_create(user=user)
         return Response({'token': token.key, 'user_id': user.pk})
+
+class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = CustomUser.objects.all()
+    serializer_class = CustomUserSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
+    lookup_field = 'id'
+
+    def get(self, request, *args, **kwargs):
+        print("Authorization:", request.headers.get('Authorization'))
+        return super().get(request, *args, **kwargs)
+
+    def put(self, request, *args, **kwargs):
+        print("Authorization:", request.headers.get('Authorization'))
+        return super().put(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        print("Authorization:", request.headers.get('Authorization'))
+        return super().delete(request, *args, **kwargs)
