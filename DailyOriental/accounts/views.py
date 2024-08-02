@@ -4,7 +4,7 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from .models import CustomUser
-from .serializers import CustomUserSerializer
+from .serializers import CustomUserSerializer, GuestUserSerializer
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.views import APIView
@@ -16,13 +16,8 @@ class RegisterView(generics.CreateAPIView):
     permission_classes = [permissions.AllowAny]
 
     def create(self, request, *args, **kwargs):
-        print("Request Data:", request.data)
         serializer = self.get_serializer(data=request.data)
-        try:
-            serializer.is_valid(raise_exception=True)
-        except Exception as e:
-            print("Validation Error:", e.detail)
-            return Response({'error': e.detail}, status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         user = CustomUser.objects.get(id=serializer.data['id'])
@@ -55,24 +50,15 @@ class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
     authentication_classes = [TokenAuthentication]
     lookup_field = 'id'
 
-    def get(self, request, *args, **kwargs):
-        print("Authorization:", request.headers.get('Authorization'))
-        return super().get(request, *args, **kwargs)
-
-    def put(self, request, *args, **kwargs):
-        print("Authorization:", request.headers.get('Authorization'))
-        return super().put(request, *args, **kwargs)
-
-    def delete(self, request, *args, **kwargs):
-        print("Authorization:", request.headers.get('Authorization'))
-        return super().delete(request, *args, **kwargs)
+class GuestUserCreateView(generics.CreateAPIView):
+    queryset = CustomUser.objects.all()
+    serializer_class = GuestUserSerializer
+    permission_classes = [permissions.AllowAny]
 
 class SurveyResultView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
-    authentication_classes = [TokenAuthentication]
+    permission_classes = [permissions.AllowAny]
 
     def post(self, request):
-        user = request.user
         survey_data = request.data.get('survey_data', [])
 
         if len(survey_data) != 30:
@@ -83,9 +69,6 @@ class SurveyResultView(APIView):
         results = [k for k, v in counter.items() if v == max_count]
 
         result_mapping = {1: '태양인', 2: '태음인', 3: '소양인', 4: '소음인'}
-        user_survey_result = ','.join([result_mapping.get(result, '') for result in results])
+        survey_result = ','.join([result_mapping.get(result, '') for result in results])
 
-        user.survey_result = user_survey_result
-        user.save()
-
-        return Response({'survey_result': user.survey_result}, status=status.HTTP_200_OK)
+        return Response({'survey_result': survey_result}, status=status.HTTP_200_OK)
