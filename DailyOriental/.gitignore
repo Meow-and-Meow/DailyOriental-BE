@@ -12,6 +12,7 @@ media
 
 # 환경 설정
 .env
+env
 
 # 가상환경
 venv/
