@@ -1,4 +1,3 @@
-# accounts/models.py
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
 
@@ -32,6 +31,7 @@ class CustomUser(AbstractUser):
     age = models.CharField(max_length=10, verbose_name="나이")
     phone = models.CharField(max_length=13, verbose_name="번호")
     reason = models.CharField(max_length=20, verbose_name="가입사유")
+    survey_result = models.CharField(max_length=10, blank=True, null=True, verbose_name="설문 결과")
 
     USERNAME_FIELD = 'id'  # 사용자 이름으로 id를 사용
     REQUIRED_FIELDS = ['name', 'gender', 'age', 'phone', 'reason']
