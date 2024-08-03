@@ -10,7 +10,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from accounts.models import CustomUser
 
-apiKey=settings.API_KEY #환경 변수에 있음
+apiKey=settings.API_KEY #환경 변수
 
 @method_decorator(csrf_exempt, name='dispatch')
 class ChatView(APIView):
