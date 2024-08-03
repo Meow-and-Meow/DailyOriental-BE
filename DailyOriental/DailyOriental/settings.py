@@ -71,6 +71,13 @@ MIDDLEWARE = [
     'whitenoise.middleware.WhiteNoiseMiddleware'
 ]
 
+CORS_ORIGIN_WHITELIST = (
+    'http://127.0.0.1:8000', 'http://localhost:3000') 
+
+USE_X_FORWARDED_PORT = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+
 ROOT_URLCONF = 'DailyOriental.urls'
 
 TEMPLATES = [
