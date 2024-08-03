@@ -1,5 +1,5 @@
-# views.py
-from rest_framework import generics, permissions, status
+# accounts/views.py
+from rest_framework import generics, permissions, status, serializers
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
@@ -8,7 +8,8 @@ from .serializers import CustomUserSerializer, GuestUserSerializer
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.views import APIView
-from collections import Counter
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 class RegisterView(generics.CreateAPIView):
     queryset = CustomUser.objects.all()
@@ -24,7 +25,15 @@ class RegisterView(generics.CreateAPIView):
         token, created = Token.objects.get_or_create(user=user)
         return Response({'token': token.key, 'user': serializer.data}, status=status.HTTP_201_CREATED, headers=headers)
 
+class LoginSerializer(serializers.Serializer):
+    id = serializers.CharField()
+    password = serializers.CharField()
+
 class CustomAuthToken(ObtainAuthToken):
+    @swagger_auto_schema(
+        request_body=LoginSerializer,
+        responses={200: 'Token'}
+    )
     def post(self, request, *args, **kwargs):
         user_id = request.data.get('id')
         password = request.data.get('password')

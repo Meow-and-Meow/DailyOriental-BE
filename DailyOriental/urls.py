@@ -1,3 +1,4 @@
+# urls.py
 from django.contrib import admin
 from django.urls import path, include, re_path
 from DailyOriental import settings
@@ -7,6 +8,7 @@ from drf_yasg import openapi
 from accounts.permissions import IsAdminUser
 from django.views.static import serve
 from rest_framework.authtoken.views import obtain_auth_token
+from accounts.views import CustomAuthToken
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -27,7 +29,7 @@ urlpatterns = [
     path('accounts/', include('accounts.urls')),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
-    path('api-token-auth/', obtain_auth_token, name='api_token_auth'),  # 토큰 인증 엔드포인트 추가
+    path('api-token-auth/', CustomAuthToken.as_view(), name='api_token_auth'),  # CustomAuthToken 뷰 사용
     re_path(r'^media/(?P<path>.*)$', serve, {'document_root':settings.MEDIA_ROOT}),
     re_path(r'^static/(?:.*)$', serve, {'document_root': settings.STATIC_ROOT, }),
 ]
