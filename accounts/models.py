@@ -18,7 +18,7 @@ class CustomUserManager(BaseUserManager):
 class CustomUser(AbstractUser):
     username = None
     id = models.CharField(max_length=150, unique=True, primary_key=True, verbose_name="사용자 ID")
-    password = models.CharField(max_length=200, verbose_name="이름")
+    password = models.CharField(max_length=200, verbose_name="비밀번호")
     name = models.CharField(max_length=50, verbose_name="이름")
     gender = models.CharField(max_length=2, verbose_name="성별")
     age = models.CharField(max_length=10, verbose_name="나이")
