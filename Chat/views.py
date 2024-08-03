@@ -8,6 +8,7 @@ import requests
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
+from accounts.models import CustomUser
 
 apiKey=settings.API_KEY
 
@@ -15,8 +16,8 @@ apiKey=settings.API_KEY
 class ChatView(APIView):
     def get(self, request, user_id, *args, **kwargs):
         try:
-            user = User.objects.get(id=user_id)
-        except User.DoesNotExist:
+            user = CustomUser.objects.get(id=user_id)
+        except CustomUser.DoesNotExist:
             return Response({'error': 'User does not exist'}, status=status.HTTP_404_NOT_FOUND)
         
         chat_history = ChatMessage.objects.filter(user=user).order_by('timestamp')
@@ -33,8 +34,8 @@ class ChatView(APIView):
             return Response({'error': 'Message cannot be empty'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            user = User.objects.get(id=user_id)
-        except User.DoesNotExist:
+            user = CustomUser.objects.get(id=user_id)
+        except CustomUser.DoesNotExist:
             return Response({'error': 'User does not exist'}, status=status.HTTP_404_NOT_FOUND)
 
         # Save user message
