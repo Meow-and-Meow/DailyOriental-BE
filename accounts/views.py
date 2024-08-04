@@ -1,5 +1,5 @@
 # accounts/views.py
-from rest_framework import generics, permissions, status
+from rest_framework import generics, permissions, status, serializers
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
@@ -8,7 +8,8 @@ from .serializers import CustomUserSerializer, GuestUserSerializer
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.views import APIView
-from collections import Counter
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 class RegisterView(generics.CreateAPIView):
     queryset = CustomUser.objects.all()
@@ -24,7 +25,15 @@ class RegisterView(generics.CreateAPIView):
         token, created = Token.objects.get_or_create(user=user)
         return Response({'token': token.key, 'user': serializer.data}, status=status.HTTP_201_CREATED, headers=headers)
 
+class LoginSerializer(serializers.Serializer):
+    id = serializers.CharField()
+    password = serializers.CharField()
+
 class CustomAuthToken(ObtainAuthToken):
+    @swagger_auto_schema(
+        request_body=LoginSerializer,
+        responses={200: 'Token'}
+    )
     def post(self, request, *args, **kwargs):
         user_id = request.data.get('id')
         password = request.data.get('password')
@@ -59,16 +68,16 @@ class SurveyResultView(APIView):
     permission_classes = [permissions.AllowAny]
 
     def post(self, request):
-        survey_data = request.data.get('survey_data', [])
+        survey_result = request.data.get('survey_result', '')
 
-        if len(survey_data) != 30:
-            return Response({'error': '설문 데이터가 올바르지 않습니다. 30개의 문항이 필요합니다.'}, status=status.HTTP_400_BAD_REQUEST)
+        if not survey_result:
+            return Response({'error': '설문 결과가 올바르지 않습니다.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        counter = Counter(survey_data)
-        max_count = max(counter.values())
-        results = [k for k, v in counter.items() if v == max_count]
+        user = request.user
+        if not user.is_authenticated:
+            return Response({'error': '인증된 사용자가 아닙니다.'}, status=status.HTTP_403_FORBIDDEN)
 
-        result_mapping = {1: '태양인', 2: '태음인', 3: '소양인', 4: '소음인'}
-        survey_result = ','.join([result_mapping.get(result, '') for result in results])
+        user.survey_result = survey_result
+        user.save()
 
         return Response({'survey_result': survey_result}, status=status.HTTP_200_OK)
