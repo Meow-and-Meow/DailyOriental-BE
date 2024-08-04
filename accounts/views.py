@@ -4,12 +4,14 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from .models import CustomUser
-from .serializers import CustomUserSerializer, GuestUserSerializer
+from .serializers import CustomUserSerializer, GuestUserSerializer, LoginSerializer
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.views import APIView
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 
 class RegisterView(generics.CreateAPIView):
     queryset = CustomUser.objects.all()
@@ -29,6 +31,7 @@ class LoginSerializer(serializers.Serializer):
     id = serializers.CharField()
     password = serializers.CharField()
 
+@method_decorator(csrf_exempt, name='dispatch')
 class CustomAuthToken(ObtainAuthToken):
     @swagger_auto_schema(
         request_body=LoginSerializer,
@@ -52,6 +55,7 @@ class CustomAuthToken(ObtainAuthToken):
         token, created = Token.objects.get_or_create(user=user)
         return Response({'token': token.key, 'user_id': user.pk})
 
+@method_decorator(csrf_exempt, name='dispatch')
 class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = CustomUser.objects.all()
     serializer_class = CustomUserSerializer
