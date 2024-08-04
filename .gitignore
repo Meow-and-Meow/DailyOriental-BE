@@ -20,7 +20,9 @@ env/
 ..myvenv
 .myvenv
 myvenv
+.myvenv/
 myvenv/
-
+.myvenv/Lib/
+.myvenv/Scripts/
 # 업로드된 미디어 파일
 media/
