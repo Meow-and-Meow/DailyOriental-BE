@@ -1,10 +1,11 @@
+# 프로젝트의 urls.py (예: DailyOriental/urls.py)
 from django.contrib import admin
 from django.urls import path, include, re_path
-from DailyOriental import settings
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
-from accounts.permissions import IsAdminUser
+from django.conf import settings
+from django.conf.urls.static import static
 from django.views.static import serve
 from rest_framework.authtoken.views import obtain_auth_token
 
@@ -25,14 +26,15 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('Chat.urls')),
     path('accounts/', include('accounts.urls')),
+    path('habits/', include('habits.urls')),  # 여기서 'habits'로 올바르게 설정
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
     path('api-token-auth/', obtain_auth_token, name='api_token_auth'),  # 토큰 인증 엔드포인트 추가
-    re_path(r'^media/(?P<path>.*)$', serve, {'document_root':settings.MEDIA_ROOT}),
-    re_path(r'^static/(?:.*)$', serve, {'document_root': settings.STATIC_ROOT, }),
+    re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
+    re_path(r'^static/(?:.*)$', serve, {'document_root': settings.STATIC_ROOT}),
 ]
 
-urlpatterns+=[
+urlpatterns += [
     re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name="schema-json"),
     re_path(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     re_path(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
