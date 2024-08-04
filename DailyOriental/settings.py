@@ -166,3 +166,6 @@ REST_FRAMEWORK = {
 }
 
 AUTH_USER_MODEL = 'accounts.CustomUser'
+
+APPEND_SLASH = False
+
