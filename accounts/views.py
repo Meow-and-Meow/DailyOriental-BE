@@ -27,10 +27,6 @@ class RegisterView(generics.CreateAPIView):
         token, created = Token.objects.get_or_create(user=user)
         return Response({'token': token.key, 'user': serializer.data}, status=status.HTTP_201_CREATED, headers=headers)
 
-class LoginSerializer(serializers.Serializer):
-    id = serializers.CharField()
-    password = serializers.CharField()
-
 @method_decorator(csrf_exempt, name='dispatch')
 class CustomAuthToken(ObtainAuthToken):
     @swagger_auto_schema(
@@ -55,7 +51,6 @@ class CustomAuthToken(ObtainAuthToken):
         token, created = Token.objects.get_or_create(user=user)
         return Response({'token': token.key, 'user_id': user.pk})
 
-@method_decorator(csrf_exempt, name='dispatch')
 class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = CustomUser.objects.all()
     serializer_class = CustomUserSerializer
@@ -69,8 +64,19 @@ class GuestUserCreateView(generics.CreateAPIView):
     permission_classes = [permissions.AllowAny]
 
 class SurveyResultView(APIView):
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
 
+    @swagger_auto_schema(
+        operation_description="Submit survey result",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'survey_result': openapi.Schema(type=openapi.TYPE_STRING, description='Survey result'),
+            },
+            required=['survey_result']
+        ),
+        responses={200: openapi.Response(description='Survey result submitted')}
+    )
     def post(self, request):
         survey_result = request.data.get('survey_result', '')
 
