@@ -75,7 +75,14 @@ class SurveyResultView(APIView):
             },
             required=['survey_result']
         ),
-        responses={200: openapi.Response(description='Survey result submitted')}
+        responses={200: openapi.Response(
+            description='Survey result submitted',
+            examples={
+                'application/json': {
+                    'survey_result': '소음인'  # 이 예제는 설명을 위해 포함
+                }
+            }
+        )}
     )
     def post(self, request):
         survey_result = request.data.get('survey_result', '')
