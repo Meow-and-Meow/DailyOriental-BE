@@ -88,6 +88,7 @@ CORS_ORIGIN_WHITELIST = [
     'http://localhost:3000',
     'https://dailyoriental.netlify.app',
     'https://port-0-dailyoriental-be-lzdcpnhy4cfd4123.sel4.cloudtype.app',
+    'https://port-0-dailyoriental-be-lzdcpnhy4cfd4123.sel4.cloudtype.app/',
 ]
 USE_X_FORWARDED_PORT = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
