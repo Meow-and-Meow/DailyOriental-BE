@@ -61,7 +61,15 @@ INSTALLED_APPS = [
     'corsheaders',
     'habits',
     'missions',
+    'notification',
+    'apscheduler',
+    'django_apscheduler',
 ]
+
+# APScheduler 설정
+APSCHEDULER_DATETIME_FORMAT = "N j, Y, f:s a"
+
+SCHEDULER_DEFAULT = True
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -168,7 +176,7 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
     ),
 }
 
@@ -176,3 +184,7 @@ AUTH_USER_MODEL = 'accounts.CustomUser'
 
 APPEND_SLASH = False
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://port-0-dailyoriental-be-lzdcpnhy4cfd4123.sel4.cloudtype.app',
+    
+]

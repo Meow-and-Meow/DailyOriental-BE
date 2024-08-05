@@ -77,3 +77,15 @@ class ChatView(APIView):
         serializer = ChatMessageSerializer(updated_chat_history, many=True)
 
         return Response({'response': assistant_response, 'chat_history': serializer.data}, status=status.HTTP_200_OK)
+    
+@method_decorator(csrf_exempt, name='dispatch')
+class AssistantMessagesView(APIView):
+    def get(self, request, id, *args, **kwargs):
+        try:
+            user = User.objects.get(id=id)
+        except User.DoesNotExist:
+            return Response({'error': 'User does not exist'}, status=status.HTTP_404_NOT_FOUND)
+        
+        assistant_messages = ChatMessage.objects.filter(user=user, role='assistant').order_by('timestamp')
+        serializer = ChatMessageSerializer(assistant_messages, many=True)
+        return Response(serializer.data)
