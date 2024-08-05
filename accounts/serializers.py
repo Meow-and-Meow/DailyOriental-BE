@@ -33,6 +33,7 @@ class GuestUserSerializer(serializers.ModelSerializer):
             'id': {'read_only': True},
             'name': {'read_only': True},
             'is_member': {'read_only': True},
+            
         }
 
     def create(self, validated_data):
