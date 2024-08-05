@@ -6,6 +6,7 @@ class Notification(models.Model):
     message = models.TextField()
     url_text = models.TextField()
     url = models.URLField(blank=True, null=True)
+    message_type = models.CharField(max_length=50)  # 메시지 타입을 추가
     created_at = models.DateTimeField(auto_now_add=True)
     is_read = models.BooleanField(default=False)
 

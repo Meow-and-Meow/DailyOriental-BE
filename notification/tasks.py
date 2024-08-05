@@ -17,11 +17,11 @@ def send_daily_mission_notifications():
             if not daily_info.all_completed:
                 message = "오늘의 미션을 완료했는지 확인해 보세요!"
                 url_text = "미션 확인하러 가기"
-                Notification.objects.create(user=user, message=message, url_text=url_text)
+                Notification.objects.create(user=user, message=message, url_text=url_text, message_type='daily_mission')
         except DailyInfo.DoesNotExist:
             message = "오늘의 미션을 완료했는지 확인해 보세요!"
             url_text = "미션 확인하러 가기"
-            Notification.objects.create(user=user, message=message, url_text=url_text)
+            Notification.objects.create(user=user, message=message, url_text=url_text, message_type='daily_mission')
 
 def send_health_tip_notifications():
     now = timezone.now()
@@ -29,7 +29,7 @@ def send_health_tip_notifications():
     for user in users:
         message = "AI 허준 건강 상식을 확인해 보세요!"
         url_text = "AI 허준에게 건강 상식 물어보기"
-        Notification.objects.create(user=user, message=message, url_text = url_text)
+        Notification.objects.create(user=user, message=message, url_text=url_text, message_type='health_tip')
 
 def send_acupressure_point_notifications():
     now = timezone.now()
@@ -37,7 +37,7 @@ def send_acupressure_point_notifications():
     for user in users:
         message = "오늘의 지압점을 확인해 보세요!"
         url_text = "손 지압점 확인하러 가기"
-        Notification.objects.create(user=user, message=message, url_text = url_text)
+        Notification.objects.create(user=user, message=message, url_text=url_text, message_type='acupressure_point')
 
 scheduler = BackgroundScheduler()
 
