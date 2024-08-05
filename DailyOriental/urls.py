@@ -25,6 +25,7 @@ schema_view = get_schema_view(
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('Chat.urls')),
+    path('alarm/', include('notification.urls')),
     path('accounts/', include('accounts.urls')),
     path('habits/', include('habits.urls')),
     path('missions/', include('missions.urls')),  # missions 앱의 URL 포함

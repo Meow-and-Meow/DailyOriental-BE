@@ -61,7 +61,15 @@ INSTALLED_APPS = [
     'corsheaders',
     'habits',
     'missions',
+    'notification',
+    'apscheduler',
+    'django_apscheduler',
 ]
+
+# APScheduler 설정
+APSCHEDULER_DATETIME_FORMAT = "N j, Y, f:s a"
+
+SCHEDULER_DEFAULT = True
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
