@@ -40,8 +40,8 @@ class ChatView(APIView):
         except User.DoesNotExist:
             return Response({'error': 'User does not exist'}, status=status.HTTP_404_NOT_FOUND)
 
-        # Save user message
-        ChatMessage.objects.create(user=user, role='user', content="사상의학은 한의학 체계 중 하나로 태양인, 소양인, 태음인, 소음인의 네 가지 체질로 나뉘어," +user_message)
+        # Save user message 변경
+        ChatMessage.objects.create(user=user, role='user', content="사상의학은 한의학 체계 중 하나로 태양인, 소양인, 태음인, 소음인의 네 가지 체질로 나뉘는데, 그 중에서" +user_message)
 
         # Fetch previous messages for this user
         previous_messages = ChatMessage.objects.filter(user=user).order_by('timestamp')
