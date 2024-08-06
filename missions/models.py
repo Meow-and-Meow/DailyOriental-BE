@@ -2,12 +2,17 @@
 from django.db import models
 from django.conf import settings
 from datetime import datetime
+import random
 
 class DailyInfo(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     date = models.DateField()
     day_of_week = models.CharField(max_length=10, blank=True, null=True)
     week_of_month = models.IntegerField(blank=True, null=True)
+    mood_mission = models.TextField(blank=True, null=True)
+    exercise_mission = models.TextField(blank=True, null=True)
+    happiness_mission = models.TextField(blank=True, null=True)
+    diet_mission = models.TextField(blank=True, null=True)
     mood_completed = models.BooleanField(default=False)
     exercise_completed = models.BooleanField(default=False)
     happiness_completed = models.BooleanField(default=False)
@@ -15,6 +20,8 @@ class DailyInfo(models.Model):
     all_completed = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
+        if isinstance(self.date, str):
+            self.date = datetime.strptime(self.date, '%Y-%m-%d').date()
         self.day_of_week = self.date.strftime('%A')
         self.week_of_month = (self.date.day - 1) // 7 + 1
         self.all_completed = all([
