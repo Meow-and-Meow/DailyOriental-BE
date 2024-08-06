@@ -20,7 +20,7 @@ jobs:
           token: ${{ secrets.CLOUDTYPE_TOKEN }}
           project: dailyoriental/dailyoriental
           stage: main
-          yaml: >
+          yaml: |
             name: dailyoriental-be
 
             app: python@3.12
