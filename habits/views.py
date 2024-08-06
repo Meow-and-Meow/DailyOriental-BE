@@ -1,7 +1,7 @@
-# habits/views.py
-from rest_framework import viewsets, permissions, generics
+from rest_framework import viewsets, permissions
 from .models import Habit
 from .serializers import HabitSerializer
+from missions.models import DailyInfo  # DailyInfo 모델 가져오기
 from drf_yasg.utils import swagger_auto_schema
 import random
 
@@ -20,15 +20,6 @@ class HabitViewSet(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
 
-    @swagger_auto_schema(operation_description="Retrieve a habit by ID")
-    def retrieve(self, request, *args, **kwargs):
-        return super().retrieve(request, *args, **kwargs)
-
-    @swagger_auto_schema(operation_description="Update a habit by ID")
-    def update(self, request, *args, **kwargs):
-        return super().update(request, *args, **kwargs)
-
-    @swagger_auto_schema(operation_description="Delete a habit by ID")
     def destroy(self, request, *args, **kwargs):
         return super().destroy(request, *args, **kwargs)
 
@@ -52,7 +43,13 @@ class HabitViewSet(viewsets.ModelViewSet):
         habits = Habit.objects.filter(category=category, user=user)
         if habits.exists():
             return random.choice(habits).text
-        return None
+        from missions.models import DEFAULT_HABITS  # DEFAULT_HABITS 가져오기
+        return random.choice(DEFAULT_HABITS[category])
+
+# CategoryHabitListView가 없다면 다음과 같이 정의합니다.
+from rest_framework import generics
+from .serializers import HabitSerializer
+from .models import Habit
 
 class CategoryHabitListView(generics.ListAPIView):
     serializer_class = HabitSerializer
@@ -60,9 +57,4 @@ class CategoryHabitListView(generics.ListAPIView):
 
     def get_queryset(self):
         category = self.kwargs['category']
-        user = self.request.user
-        return Habit.objects.filter(user=user, category=category)
-
-    @swagger_auto_schema(operation_description="List habits by category")
-    def get(self, request, *args, **kwargs):
-        return super().get(request, *args, **kwargs)
+        return Habit.objects.filter(category=category, user=self.request.user)
