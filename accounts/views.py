@@ -10,6 +10,9 @@ from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.views import APIView
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
+from notification.models import Notification
+from django.utils import timezone
+import datetime
 
 from habits.models import Habit
 
@@ -26,6 +29,27 @@ class RegisterView(generics.CreateAPIView):
         user = CustomUser.objects.get(id=serializer.data['id'])
         token, created = Token.objects.get_or_create(user=user)
         self.create_default_habits(user)
+
+        # Create initial notifications for the new user
+        now = timezone.now()
+        today = datetime.date.today()
+
+        # Daily mission notification
+        daily_mission_message = "오늘의 미션을 완료했는지 확인해 보세요!"
+        daily_mission_url_text = "미션 확인하러 가기"
+        Notification.objects.create(user=user, message=daily_mission_message, url_text=daily_mission_url_text, message_type='daily_mission')
+
+        # Health tip notification
+        health_tip_message = "AI 허준 건강 상식을 확인해 보세요!"
+        health_tip_url_text = "AI 허준에게 건강 상식 물어보기"
+        Notification.objects.create(user=user, message=health_tip_message, url_text=health_tip_url_text, message_type='health_tip')
+
+        # Acupressure point notification
+        acupressure_point_message = "오늘의 지압점을 확인해 보세요!"
+        acupressure_point_url_text = "손 지압점 확인하러 가기"
+        Notification.objects.create(user=user, message=acupressure_point_message, url_text=acupressure_point_url_text, message_type='acupressure_point')
+
+
         return Response({'token': token.key, 'user': serializer.data}, status=status.HTTP_201_CREATED, headers=headers)
 
     def create_default_habits(self, user):

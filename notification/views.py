@@ -14,7 +14,7 @@ class NotificationViewSet(viewsets.ModelViewSet):
         # Filter out notifications that are read
         return self.queryset.filter(user=self.request.user, is_read=False).order_by('-created_at')
 
-    def retrieve(self, request, *args, **kwargs):
+    def update(self, request, *args, **kwargs):
         notification = self.get_object()
 
         if notification.user != request.user:
