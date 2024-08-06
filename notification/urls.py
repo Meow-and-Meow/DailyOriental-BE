@@ -5,5 +5,7 @@ from .views import NotificationViewSet
 
 urlpatterns = [
     path('notifications/', NotificationViewSet.as_view({'get': 'list'}), name='notification-list'),
-    path('notifications/<int:pk>/', NotificationViewSet.as_view({'put': 'update'}), name='notification-read'),
+    path('notifications/<int:pk>/', NotificationViewSet.as_view({'delete': 'destroy'}),  name='notification-delete'),
 ]
+
+

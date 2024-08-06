@@ -14,16 +14,11 @@ class NotificationViewSet(viewsets.ModelViewSet):
         # Filter out notifications that are read
         return self.queryset.filter(user=self.request.user, is_read=False).order_by('-created_at')
 
-    def update(self, request, *args, **kwargs):
+    def destroy(self, request, *args, **kwargs):
         notification = self.get_object()
 
         if notification.user != request.user:
             return Response({'detail': 'Permission denied.'}, status=status.HTTP_403_FORBIDDEN)
 
-        # Mark notification as read
-        if not notification.is_read:
-            notification.is_read = True
-            notification.save()
-
-        serializer = self.get_serializer(notification)
-        return Response(serializer.data)
+        notification.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
