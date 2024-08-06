@@ -3,6 +3,6 @@ from django.urls import path
 from .views import DailyInfoView, DailyInfoDetailView
 
 urlpatterns = [
-    path('', DailyInfoView.as_view(), name='daily-info-list-create'),
-    path('<date>/', DailyInfoDetailView.as_view(), name='daily-info-detail'),
+    path('', DailyInfoView.as_view(), name='dailyinfo-list-create'),
+    path('<str:date>/', DailyInfoDetailView.as_view(), name='dailyinfo-detail'),
 ]

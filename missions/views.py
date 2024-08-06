@@ -1,10 +1,9 @@
-# missions/views.py
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
-from .models import DailyInfo, DEFAULT_HABITS
+from .models import DailyInfo
 from .serializers import DailyInfoSerializer
 from drf_yasg.utils import swagger_auto_schema
-from habits.models import Habit
+from habits.models import Habit, DEFAULT_HABITS  # 수정된 부분
 import random
 from datetime import datetime
 
@@ -56,24 +55,6 @@ class DailyInfoDetailView(generics.RetrieveUpdateAPIView):
     @swagger_auto_schema(operation_description="Retrieve or update daily info by date")
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
-
-    @swagger_auto_schema(operation_description="Partial update daily info by date")
-    def patch(self, request, *args, **kwargs):
-        partial = kwargs.pop('partial', True)
-        instance = self.get_object()
-        data = request.data
-        if 'mood_mission' in data and instance.mood_mission:
-            data.pop('mood_mission')
-        if 'exercise_mission' in data and instance.exercise_mission:
-            data.pop('exercise_mission')
-        if 'happiness_mission' in data and instance.happiness_mission:
-            data.pop('happiness_mission')
-        if 'diet_mission' in data and instance.diet_mission:
-            data.pop('diet_mission')
-        serializer = self.get_serializer(instance, data=data, partial=partial)
-        serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
-        return Response(serializer.data)
 
     def get_queryset(self):
         user = self.request.user

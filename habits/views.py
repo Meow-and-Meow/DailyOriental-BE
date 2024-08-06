@@ -1,7 +1,8 @@
-from rest_framework import viewsets, permissions
-from .models import Habit
+from rest_framework import viewsets, permissions, status
+from rest_framework.response import Response
+from .models import Habit, DEFAULT_HABITS
 from .serializers import HabitSerializer
-from missions.models import DailyInfo  # DailyInfo 모델 가져오기
+from missions.models import DailyInfo
 from drf_yasg.utils import swagger_auto_schema
 import random
 
@@ -12,19 +13,28 @@ class HabitViewSet(viewsets.ModelViewSet):
 
     @swagger_auto_schema(operation_description="Create a new habit")
     def create(self, request, *args, **kwargs):
-        response = super().create(request, *args, **kwargs)
-        self.update_daily_info_missions(request.user, request.data['category'])
-        return response
+        # 클라이언트에서 user 필드를 보내지 않아도 되도록 데이터에서 제거
+        data = request.data.copy()
+        data['user'] = request.user.id
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        self.update_daily_info_missions(request.user, data['category'])
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     @swagger_auto_schema(operation_description="List all habits")
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
 
+    def get_queryset(self):
+        return Habit.objects.filter(user=self.request.user)
+
     def destroy(self, request, *args, **kwargs):
         return super().destroy(request, *args, **kwargs)
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        serializer.save(user=self.request.user, default=False)
 
     def update_daily_info_missions(self, user, category):
         daily_infos = DailyInfo.objects.filter(user=user)
@@ -43,13 +53,9 @@ class HabitViewSet(viewsets.ModelViewSet):
         habits = Habit.objects.filter(category=category, user=user)
         if habits.exists():
             return random.choice(habits).text
-        from missions.models import DEFAULT_HABITS  # DEFAULT_HABITS 가져오기
         return random.choice(DEFAULT_HABITS[category])
 
-# CategoryHabitListView가 없다면 다음과 같이 정의합니다.
 from rest_framework import generics
-from .serializers import HabitSerializer
-from .models import Habit
 
 class CategoryHabitListView(generics.ListAPIView):
     serializer_class = HabitSerializer
